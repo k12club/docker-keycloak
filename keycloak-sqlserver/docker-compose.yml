@@ -1,0 +1,29 @@
+version: "3.1"
+
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    container_name: mssql_server
+    ports:
+      - 1433:1433
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=Password!23
+  keycloak:
+    image: jboss/keycloak:latest
+    container_name: keycloak_service
+    depends_on: 
+      - mssql
+    ports:
+      - 8080:8080
+    environment:
+      - KEYCLOAK_USER=admin
+      - KEYCLOAK_PASSWORD=admin
+      - KEYCLOAK_IMPORT=/tmp/realm-export.json
+      - DB_VENDOR=mssql
+      - DB_USER=sa
+      - DB_PASSWORD=Password!23
+      - DB_ADDR=mssql
+      - DB_DATABASE=Keycloak
+    volumes:
+      - ./tmp/realm-export.json:/tmp/realm-export.json
